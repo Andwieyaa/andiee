@@ -1,362 +1,110 @@
-# [iCheck plugin](http://damirfoy.com/iCheck/) ![v0.9.1](http://damirfoy.com/iCheck/0.9.1.png)
-#### Highly customizable checkboxes and radio buttons for jQuery and Zepto.
+# Flot [![Build status](https://travis-ci.org/flot/flot.png)](https://travis-ci.org/flot/flot)
 
-Refer to the [iCheck website](http://damirfoy.com/iCheck/) for examples.
+## About ##
 
-![Skins](http://damirfoy.com/iCheck/examples.png)
+Flot is a Javascript plotting library for jQuery.  
+Read more at the website: <http://www.flotcharts.org/>
 
-
-Features
---------
-
-* **Identical inputs across different browsers and devices** — both [desktop and mobile](#browser-support)
-* **Touch devices support** — iOS, Android, BlackBerry, Windows Phone
-* **Keyboard accessible inputs** — `Tab`, `Spacebar`, `Arrow up/down` and other shortcuts
-* **Customization freedom** — use any HTML and CSS to style inputs (try [6 Retina-ready skins](http://damirfoy.com/iCheck/))
-* **jQuery and Zepto** JavaScript libraries support
-* **Lightweight size** — 1 kb gzipped
-
------
-
-* [31 options](#options) to customize checkboxes and radio buttons
-* [11 callbacks](#callbacks) to handle changes
-* [9 methods](#methods) to make changes programmatically
-* Saves changes to original inputs, [works carefully](#initialize) with any selectors
+Take a look at the the examples in examples/index.html; they should give a good
+impression of what Flot can do, and the source code of the examples is probably
+the fastest way to learn how to use Flot.
 
 
-How it works
-------------
+## Installation ##
 
-iCheck works with checkboxes and radio buttons like a constructor. **It wraps each input with a div**, which may be customized by you or using one of the [available skins](http://damirfoy.com/iCheck/). You may also place inside that div some HTML code or text using `insert` option.
+Just include the Javascript file after you've included jQuery.
 
-For this HTML:
+Generally, all browsers that support the HTML5 canvas tag are
+supported.
+
+For support for Internet Explorer < 9, you can use [Excanvas]
+[excanvas], a canvas emulator; this is used in the examples bundled
+with Flot. You just include the excanvas script like this:
 
 ```html
-<label>
-  <input type="checkbox" name="quux[1]" disabled>
-  Foo
-</label>
-
-<label for="baz[1]">Bar</label>
-<input type="radio" name="quux[2]" id="baz[1]" checked>
-
-<label for="baz[2]">Bar</label>
-<input type="radio" name="quux[2]" id="baz[2]">
+<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="excanvas.min.js"></script><![endif]-->
 ```
 
-With default options you'll get nearly this:
+If it's not working on your development IE 6.0, check that it has
+support for VML which Excanvas is relying on. It appears that some
+stripped down versions used for test environments on virtual machines
+lack the VML support.
+
+You can also try using [Flashcanvas][flashcanvas], which uses Flash to
+do the emulation. Although Flash can be a bit slower to load than VML,
+if you've got a lot of points, the Flash version can be much faster
+overall. Flot contains some wrapper code for activating Excanvas which
+Flashcanvas is compatible with.
+
+You need at least jQuery 1.2.6, but try at least 1.3.2 for interactive
+charts because of performance improvements in event handling.
+
+
+## Basic usage ##
+
+Create a placeholder div to put the graph in:
 
 ```html
-<label>
-  <div class="icheckbox disabled">
-    <input type="checkbox" name="quux[1]" disabled>
-  </div>
-  Foo
-</label>
-
-<label for="baz[1]">Bar</label>
-<div class="iradio checked">
-  <input type="radio" name="quux[2]" id="baz[1]" checked>
-</div>
-
-<label for="baz[2]">Bar</label>
-<div class="iradio">
-  <input type="radio" name="quux[2]" id="baz[2]">
-</div>
+<div id="placeholder"></div>
 ```
 
-**By default, iCheck doesn't provide any CSS styles for wrapper divs** (if you don't use [skins](http://damirfoy.com/iCheck/)).
-
-
-Options
--------
-
-These options are default:
-
-```js
-{
-  // 'checkbox' or 'radio' to style only checkboxes or radio buttons, both by default
-  handle: '',
-
-  // base class added to customized checkboxes
-  checkboxClass: 'icheckbox',
-
-  // base class added to customized radio buttons
-  radioClass: 'iradio',
-
-  // class added on checked state (input.checked = true)
-  checkedClass: 'checked',
-
-    // if not empty, used instead of 'checkedClass' option (input type specific)
-    checkedCheckboxClass: '',
-    checkedRadioClass: '',
-
-  // if not empty, added as class name on unchecked state (input.checked = false)
-  uncheckedClass: '',
-
-    // if not empty, used instead of 'uncheckedClass' option (input type specific)
-    uncheckedCheckboxClass: '',
-    uncheckedRadioClass: '',
-
-  // class added on disabled state (input.disabled = true)
-  disabledClass: 'disabled',
-
-    // if not empty, used instead of 'disabledClass' option (input type specific)
-    disabledCheckboxClass: '',
-    disabledRadioClass: '',
-
-  // if not empty, added as class name on enabled state (input.disabled = false)
-  enabledClass: '',
-
-    // if not empty, used instead of 'enabledClass' option (input type specific)
-    enabledCheckboxClass: '',
-    enabledRadioClass: '',
-
-  // class added on indeterminate state (input.indeterminate = true)
-  indeterminateClass: 'indeterminate',
-
-    // if not empty, used instead of 'indeterminateClass' option (input type specific)
-    indeterminateCheckboxClass: '',
-    indeterminateRadioClass: '',
-
-  // if not empty, added as class name on determinate state (input.indeterminate = false)
-  determinateClass: '',
-
-    // if not empty, used instead of 'determinateClass' option (input type specific)
-    determinateCheckboxClass: '',
-    determinateRadioClass: '',
-
-  // class added on hover state (pointer is moved onto input)
-  hoverClass: 'hover',
-
-  // class added on focus state (input has gained focus)
-  focusClass: 'focus',
-
-  // class added on active state (mouse button is pressed on input)
-  activeClass: 'active',
-
-  // adds hoverClass to customized input on label hover and labelHoverClass to label on input hover
-  labelHover: true,
-
-    // class added to label if labelHover set to true
-    labelHoverClass: 'hover',
-
-  // increase clickable area by given % (negative number to decrease)
-  increaseArea: '',
-
-  // true to set 'pointer' CSS cursor over enabled inputs and 'default' over disabled
-  cursor: false,
-
-  // set true to inherit original input's class name
-  inheritClass: false,
-
-  // if set to true, input's id is prefixed with 'iCheck-' and attached
-  inheritID: false,
-
-  // add HTML code or text inside customized input
-  insert: ''
-}
-```
-
-There's no need to copy and paste all of them, you can just mention the ones you need:
-
-```js
-$('input').iCheck({
-  labelHover: false,
-  cursor: true
-});
-```
-
-You can choose any class names and slyle them as you want.
-
-
-Initialize
-----------
-
-Just include `jquery.icheck.js` (or `zepto.icheck.js`) after [jQuery v1.7+](http://jquery.com) (or [Zepto](http://github.com/madrobby/zepto#zepto-modules) [polyfill, event, data]).
-
-iCheck supports any selectors, but handles only checkboxes and radio buttons:
-
-```js
-// customize all inputs (will search for checkboxes and radio buttons)
-$('input').iCheck();
-
-// handle inputs only inside $('.block')
-$('.block input').iCheck();
-
-// handle only checkboxes inside $('.test')
-$('.test input').iCheck({
-  handle: 'checkbox'
-});
-
-// handle .vote class elements (will search inside the element, if it's not an input)
-$('.vote').iCheck();
-
-// you can also change options after inputs are customized
-$('input.some').iCheck({
-  // different options
-});
-```
-
-Indeterminate
----------
-
-HTML5 allows specifying [indeterminate](http://css-tricks.com/indeterminate-checkboxes/) ("partially" checked) state for checkboxes. iCheck supports this for both checkboxes and radio buttons.
-
-You can make an input indeterminate through HTML using additional attributes (supported by iCheck). Both do the same job, but `indeterminate="true"` may not work in some browsers (like IE7):
+You need to set the width and height of this div, otherwise the plot
+library doesn't know how to scale the graph. You can do it inline like
+this:
 
 ```html
-indeterminate="true"
-<input type="checkbox" indeterminate="true">
-<input type="radio" indeterminate="true">
-
-determinate="false"
-<input type="checkbox" determinate="false">
-<input type="radio" determinate="false">
+<div id="placeholder" style="width:600px;height:300px"></div>
 ```
 
-`indeterminate` and `determinate` [methods](#methods) can be used to toggle indeterminate state.
+You can also do it with an external stylesheet. Make sure that the
+placeholder isn't within something with a display:none CSS property -
+in that case, Flot has trouble measuring label dimensions which
+results in garbled looks and might have trouble measuring the
+placeholder dimensions which is fatal (it'll throw an exception).
 
-Callbacks
----------
-
-iCheck provides plenty callbacks, which may be used to handle changes.
-
-<table>
-  <thead>
-    <tr>
-      <th>Callback name</th>
-      <th>When used</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>ifClicked</td>
-      <td>user clicked on a customized input or an assigned label</td>
-    </tr>
-    <tr>
-      <td>ifChanged</td>
-      <td>input's "checked", "disabled" or "indeterminate" state is changed</td>
-    </tr>
-    <tr>
-      <td>ifChecked</td>
-      <td>input's state is changed to "checked"</td>
-    </tr>
-    <tr>
-      <td>ifUnchecked</td>
-      <td>"checked" state is removed</td>
-    </tr>
-    <tr>
-      <td>ifToggled</td>
-      <td>input's "checked" state is changed</td>
-    </tr>
-    <tr>
-      <td>ifDisabled</td>
-      <td>input's state is changed to "disabled"</td>
-    </tr>
-    <tr>
-      <td>ifEnabled</td>
-      <td>"disabled" state is removed</td>
-    </tr>
-    <tr>
-      <td>ifIndeterminate</td>
-      <td>input's state is changed to "indeterminate"</td>
-    </tr>
-    <tr>
-      <td>ifDeterminate</td>
-      <td>"indeterminate" state is removed</td>
-    </tr>
-    <tr>
-      <td>ifCreated</td>
-      <td>input is just customized</td>
-    </tr>
-    <tr>
-      <td>ifDestroyed</td>
-      <td>customization is just removed</td>
-    </tr>
-  </tbody>
-</table>
-
-Use `on()` method to bind them to inputs:
+Then when the div is ready in the DOM, which is usually on document
+ready, run the plot function:
 
 ```js
-$('input').on('ifChecked', function(event){
-  alert(event.type + ' callback');
-});
+$.plot($("#placeholder"), data, options);
 ```
 
-`ifCreated` callback should be binded before plugin init.
-
-
-Methods
--------
-
-These methods can be used to make changes programmatically (any selectors can be used):
+Here, data is an array of data series and options is an object with
+settings if you want to customize the plot. Take a look at the
+examples for some ideas of what to put in or look at the 
+[API reference](API.md). Here's a quick example that'll draw a line 
+from (0, 0) to (1, 1):
 
 ```js
-// change input's state to 'checked'
-$('input').iCheck('check');
-
-// remove 'checked' state
-$('input').iCheck('uncheck');
-
-// toggle 'checked' state
-$('input').iCheck('toggle');
-
-// change input's state to 'disabled'
-$('input').iCheck('disable');
-
-// remove 'disabled' state
-$('input').iCheck('enable');
-
-// change input's state to 'indeterminate'
-$('input').iCheck('indeterminate');
-
-// remove 'indeterminate' state
-$('input').iCheck('determinate');
-
-// apply input changes, which were done outside the plugin
-$('input').iCheck('update');
-
-// remove all traces of iCheck
-$('input').iCheck('destroy');
+$.plot($("#placeholder"), [ [[0, 0], [1, 1]] ], { yaxis: { max: 1 } });
 ```
 
-You may also specify some function, that will be executed on each method call:
-
-```js
-$('input').iCheck('check', function(){
-  alert('Well done, Sir');
-});
-```
-
-Feel free to fork and submit pull-request or submit an issue if you find something not working.
+The plot function immediately draws the chart and then returns a plot
+object with a couple of methods.
 
 
-Comparison
-----------
+## What's with the name? ##
 
-iCheck is created to avoid routine of reinventing the wheel when working with checkboxes and radio buttons. It provides an expected identical result for the huge number of browsers, devices and their versions. Callbacks and methods can be used to easily handle and make changes at customized inputs.
+First: it's pronounced with a short o, like "plot". Not like "flawed".
 
-There are some CSS3 ways available to style checkboxes and radio buttons, like [this one](http://webdesign.tutsplus.com/tutorials/htmlcss-tutorials/quick-tip-easy-css3-checkboxes-and-radio-buttons/). You have to know about some of the disadvantages of similar methods:
+So "Flot" rhymes with "plot".
 
-* inputs are keyboard inaccessible, since `display: none` or `visibility: hidden` used to hide them
-* poor browser support
-* multiple bugs on mobile devices
-* tricky, harder to maintain CSS code
-* JavaScript is still needed to fix specific issues
-
-While CSS3 method is quite limited solution, iCheck is made to be an everyday replacement covering most of the tasks.
+And if you look up "flot" in a Danish-to-English dictionary, some of
+the words that come up are "good-looking", "attractive", "stylish",
+"smart", "impressive", "extravagant". One of the main goals with Flot
+is pretty looks.
 
 
-Browser support
----------------
+## Notes about the examples ##
 
-iCheck is verified to work in Internet Explorer 6+, Firefox 2+, Opera 9+, Google Chrome and Safari browsers. Should also work in many others.
+In order to have a useful, functional example of time-series plots using time
+zones, date.js from [timezone-js][timezone-js] (released under the Apache 2.0
+license) and the [Olson][olson] time zone database (released to the public
+domain) have been included in the examples directory.  They are used in
+examples/axes-time-zones/index.html.
 
-Mobile browsers (like Opera mini, Chrome mobile, Safari mobile, Android browser and others) are also supported. Tested on iOS (iPad, iPhone, iPod), Android, BlackBerry and Windows Phone devices.
 
-
-License
--------
-iCheck plugin is released under the [MIT License](http://en.wikipedia.org/wiki/MIT_License). Feel free to use it in personal and commercial projects.
+[excanvas]: http://code.google.com/p/explorercanvas/
+[flashcanvas]: http://code.google.com/p/flashcanvas/
+[timezone-js]: https://github.com/mde/timezone-js
+[olson]: ftp://ftp.iana.org/tz/
